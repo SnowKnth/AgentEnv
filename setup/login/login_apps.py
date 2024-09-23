@@ -3,6 +3,7 @@ import yaml
 import uiautomator2 as u2
 import argparse
 
+'''Open the apps and keep running for 10 seconds using Monkey mode.'''
 def login_apps(d, app_names):
     for app_name in app_names:
         app = app_factory(d, app_name)

@@ -18,7 +18,7 @@ class EmulatorController:
         snapshot_name (str): the name of snapshot。
         """
         # cmd = ["emulator", "-avd", self.avd_name, "-snapshot", snapshot_name, "-no-snapshot-save"]
-        cmd = ["emulator", "-avd", self.avd_name,"-no-snapshot-save"]
+        cmd = ["emulator", "-avd", self.avd_name,"-no-snapshot-save", "-no-window", "-feature", "-Vulkan"]
         for key, value in self.params.items():
             if key == "no-window":
                 if value == "true":
