@@ -4,6 +4,7 @@ import time
 import uiautomator2 as u2
 import subprocess
 
+
 class Device(object):
 
     def __init__(self, device_serial: str) -> None:
@@ -27,7 +28,7 @@ class Device(object):
         Connect to the device. Set up the DroidBot app and Minicap.
         """
         self._activate_uiautomator2()
-        time.sleep(5)
+        # time.sleep(5)
         self.u2d = u2.connect(self.serial)
         self.logger.info("Connected to device.")
 
@@ -56,7 +57,8 @@ class Device(object):
         return current['activity']
     
     def get_installed_apps(self) -> List[str]:
-        return self.u2d.app_list()    
+        apps = self.u2d.app_list() 
+        return apps   
 
     def click(self, x: int, y: int):
         status = self.u2d.click(x, y)
@@ -64,6 +66,8 @@ class Device(object):
         
     def swipe(self, x1: int, y1: int, x2: int, y2: int, duration=0.5):
         status = self.u2d.swipe(x1, y1, x2, y2, duration)
+        # self.u2d = None
+        # time.sleep(1)
         return status
 
     def input_text(self, text: str):
@@ -82,6 +86,12 @@ class Device(object):
     def back(self):
         status = self.u2d.press("back")
         return status
+    
+    def adb_shell(self, cmd:str):
+        status = self.u2d.shell(cmd)
+        return status
+    
+
 
 
         

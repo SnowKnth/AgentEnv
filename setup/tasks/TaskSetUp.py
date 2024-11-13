@@ -81,7 +81,7 @@ _TaskSetUpMap = {
 }
 
 def TaskSetUp(device, instruction):
-    d = device
+    d = device #u2d
     taskSetup= _TaskSetUpMap.get(instruction)
 
     if taskSetup:

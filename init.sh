@@ -2,7 +2,7 @@
 
 # Check the number of input parameters
 if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <android_sdk_root> <android_avd_home> <avd_name>"
+    echo "Usage: $0 <android_sdk_root> <android_avd_home> <avd_name> \$#=$#" >&2
     exit 1
 fi
 
