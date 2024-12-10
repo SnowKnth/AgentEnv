@@ -290,15 +290,16 @@ class AgentEnv:
         # action example
         # action_type: type, touch_point: [-1.0, -1.0], lift_point: [-1.0, -1.0], typed_text: ”best rated coffee maker”
         """Takes a step in the environment."""
+        operator_state = 0
         if not action.startswith('am'):
             action_dict = parse_action_string(action)
             action_type, action_para = parse_action(action_dict)
             self.current_action = self._trans_action_format(action_type, action_para)
-            operator_state = self._execute_action(action_type, action_para)
+            # operator_state = self._execute_action(action_type, action_para)
         else:
             self.current_action = action
             action_type = "INTENT"
-            operator_state = self.device.adb_shell(action)
+            # operator_state = self.device.adb_shell(action)
             
         # save the action
         tag = self.current_steps
@@ -373,9 +374,9 @@ class AgentEnv:
     
     def setup_task(self, instruction: str) -> None:
         self.logger.info(f"setting up the task: {instruction}")
-        self.device.connect()
+
         TaskSetUp(self.device.u2d, instruction)
-        self.device.disconnect()
+        
 
 
 
@@ -402,8 +403,8 @@ class AndroidController(AgentEnv): # AndroidController is a subclass of AgentEnv
         return ret
 
     def text(self, input_str):
-        input_str = input_str.replace(" ", "%s")
-        input_str = input_str.replace("'", "")
+        # input_str = input_str.replace(" ", "%s") # Original AgentEnv
+        # input_str = input_str.replace("'", "") # Original AgentEnv
         action = f"action_type: type, touch_point: [-1.0, -1.0], lift_point: [-1.0, -1.0], typed_text: '{input_str}'"
         # AgentEnv interface post_action       
         ret = self.post_action(action)

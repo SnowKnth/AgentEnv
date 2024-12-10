@@ -36,6 +36,9 @@ class Device(object):
         """
         Disconnect from the device.
         """
+        self.adb_shell("am force-stop com.github.uiautomator")
+        self.adb_shell("am stopservice -a com.github.uiautomator.ACTION_START")
+        self.adb_shell("am force-stop com.github.uiautomator.test")
         self.u2d.stop_uiautomator()
         self.logger.info("Disconnected from device.")
 
@@ -66,8 +69,6 @@ class Device(object):
         
     def swipe(self, x1: int, y1: int, x2: int, y2: int, duration=0.5):
         status = self.u2d.swipe(x1, y1, x2, y2, duration)
-        # self.u2d = None
-        # time.sleep(1)
         return status
 
     def input_text(self, text: str):
