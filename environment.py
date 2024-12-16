@@ -300,17 +300,17 @@ class AgentEnv:
             self.current_action = action
             action_type = "INTENT"
             # operator_state = self.device.adb_shell(action)
+        if not ( self.current_action.startswith("am force-stop") and self.current_steps == 0 ):   
+            # save the action
+            tag = self.current_steps
+            action_dir_path = self._setup_directories(self.task_output_path, ['action'])[0]
+            action_path = os.path.join(action_dir_path, f"{tag}.action")
+            with open(action_path, "w") as action_file:
+                action_file.write(self.current_action)# n.action
             
-        # save the action
-        tag = self.current_steps
-        action_dir_path = self._setup_directories(self.task_output_path, ['action'])[0]
-        action_path = os.path.join(action_dir_path, f"{tag}.action")
-        with open(action_path, "w") as action_file:
-            action_file.write(self.current_action)# n.action
-        
-        self.logger.info("execute action: " + self.current_action)
-        self.current_steps += 1
-        self.logger.info(f"current steps: {self.current_steps},action type: {action_type}")
+            self.logger.info("execute action: " + self.current_action)
+            self.current_steps += 1
+            self.logger.info(f"current steps: {self.current_steps},action type: {action_type}")
 
         if self.current_steps >= self.max_steps or action_type == "STATUS_TASK_COMPLETE" or action_type == "STATUS_TASK_IMPOSSIBLE":
             self.episode_end = True
@@ -328,9 +328,16 @@ class AgentEnv:
                 with open(self.ep_installed_fp, 'w') as file:
                     file.write("")
 
-        time.sleep(5)
+        # time.sleep(1) # original 5, i guess used to wait executing; now disable executing, so no need to wait
         self.logger.info("action executed successfully")
         return operator_state
+    
+    def save_chat(self, conversation: str):
+            tag = self.current_steps
+            action_dir_path = self._setup_directories(self.task_output_path, ['chat'])[0]
+            action_path = os.path.join(action_dir_path, f"{tag}.chat")
+            with open(action_path, "w") as action_file:
+                action_file.write(conversation)# n.chat
     
     def get_device_size(self) -> tuple[int, int]:
         # return width, height
