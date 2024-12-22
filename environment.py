@@ -338,6 +338,17 @@ class AgentEnv:
             action_path = os.path.join(action_dir_path, f"{tag}.chat")
             with open(action_path, "w") as action_file:
                 action_file.write(conversation)# n.chat
+
+    def save_intructions(self, similar_ins: str, instructions: dict):
+        sim_path = os.path.join(self.task_output_path, "instructions_sim.txt")
+        ins_path = os.path.join(self.task_output_path, "instructions.json")        
+         # Ensure the directory exists
+        os.makedirs(os.path.dirname(ins_path), exist_ok=True)
+        with open(sim_path,"w") as sim_file:
+            sim_file.write(similar_ins)
+        with open(ins_path,"w") as instruction_file:
+            json.dump(instructions, instruction_file, indent=4)
+
     
     def get_device_size(self) -> tuple[int, int]:
         # return width, height
