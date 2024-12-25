@@ -291,11 +291,14 @@ class AgentEnv:
         # action_type: type, touch_point: [-1.0, -1.0], lift_point: [-1.0, -1.0], typed_text: ”best rated coffee maker”
         """Takes a step in the environment."""
         operator_state = 0
-        if not action.startswith('am'):
+        if not action.startswith('am') and not action.startswith('Oracle'):
             action_dict = parse_action_string(action)
             action_type, action_para = parse_action(action_dict)
             self.current_action = self._trans_action_format(action_type, action_para)
             # operator_state = self._execute_action(action_type, action_para)
+        elif action.startswith('Oracle'):
+            self.current_action = action
+            action_type = "Oracle"
         else:
             self.current_action = action
             action_type = "INTENT"
