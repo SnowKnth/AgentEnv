@@ -128,7 +128,7 @@ class PrepareApps:
 
 class AgentEnv:
     def __init__(self, avd_name = None, emulator_controller_args=None,\
-                 max_steps=30,local_output_path="captured_data",instruction_fp="docs/instructions/llamatouch_task_metadata.csv") -> None:
+                 max_steps=30,local_output_path="exec_output",instruction_fp="docs/instructions/llamatouch_task_metadata.csv") -> None:
         
         self.device_serial = f"emulator-{emulator_controller_args['port']}"
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -149,7 +149,7 @@ class AgentEnv:
 
     def _generate_instruction(self) -> Iterator[tuple[str, str]]:
         for _, row in self.instructions.iterrows(): # add: gr_path, app_short, episode,
-            yield row['description'], row['path'], row['app'], row['episode'], os.path.join(self.local_output_path, str(row['episode']))
+            yield row['description'], row['path'], row['app'], row['episode'], os.path.join(self.local_output_path, row['category'], str(row['episode']))
 
 
     def _setup_directories(self, base_path, subdirectories) -> list[str]:
@@ -363,7 +363,7 @@ class AgentEnv:
         try:
             instruction, gr_path, app_short, episode, path = next(self.instruction_generator)
 
-            self.task_output_path = path
+            self.task_output_path = path.replace("googleapps", "google_apps").replace("webshopping", "web_shopping")
             return instruction, gr_path, app_short, episode
         except StopIteration:
             self.logger.warning("All instructions have been fetched.")  

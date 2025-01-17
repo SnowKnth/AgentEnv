@@ -29,7 +29,7 @@ class EmulatorController:
                     return 0
 
         # Build the command to start the emulator
-        cmd = ["emulator", "-avd", self.avd_name, "-snapshot", snapshot_name, "-no-snapshot-save", "-feature", "-Vulkan"]
+        cmd = ["emulator", "-avd", self.avd_name, "-port", self.device_serial.split("-")[1] , "-snapshot", snapshot_name, "-no-snapshot-save", "-feature", "-Vulkan"]
         for key, value in self.params.items():
             if key == "no-window":
                 if value == "true":

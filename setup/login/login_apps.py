@@ -6,8 +6,12 @@ import argparse
 '''Open the apps and keep running for 10 seconds using Monkey mode.'''
 def login_apps(d, app_names):
     for app_name in app_names:
-        app = app_factory(d, app_name)
-        app.login()
+        try:
+            app = app_factory(d, app_name)
+            app.login()
+        except Exception as e:
+            print(f"Error in login_apps for app {app_name}: {e}")
+            continue
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('input android emulator serial number')
