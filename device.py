@@ -21,7 +21,7 @@ class Device(object):
             self.logger.info("Initializing uiautomator2...")
 
         except subprocess.CalledProcessError as e:
-            print("Failed to initialize uiautomator2 with error:", e)
+            logging.info("Failed to initialize uiautomator2 with error:", e)
 
     def connect(self) -> None:
         """

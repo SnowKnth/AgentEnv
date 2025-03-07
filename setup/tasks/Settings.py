@@ -1,4 +1,5 @@
 import time
+import logging
 from setup.tasks.BaseTaskSetup import BaseTaskSetup, SetupFailureException
 
 '''
@@ -39,7 +40,7 @@ class SettingsTask01(BaseTaskSetup):
             # If the switch is off, click it to turn it on
             if not is_switch_on:
                 switch_instance.click()
-                print("Switch turned on.")
+                logging.info("Switch turned on.")
 
             self.d.press("home")
             time.sleep(2)
@@ -90,7 +91,7 @@ class SettingsTask02(BaseTaskSetup):
             # If the switch is off, click it to turn it on
             if not is_switch_on:
                 switch_element.click()
-                print("Wi-Fi switch turned on.")
+                logging.info("Wi-Fi switch turned on.")
 
             # Stop the settings app
             self.d.press("home")
@@ -98,7 +99,7 @@ class SettingsTask02(BaseTaskSetup):
             self.d.app_stop("com.android.settings")
 
         except Exception as e:
-            print(f"Error during setup: {e}")
+            logging.info(f"Error during setup: {e}")
             raise SetupFailureException("Unable to configure the environment properly")
 
 class SettingsTask03(BaseTaskSetup):
@@ -139,7 +140,7 @@ class SettingsTask03(BaseTaskSetup):
             self.d.app_stop("com.android.settings")
 
         except Exception as e:
-            print(f"Error during setup: {e}")
+            logging.info(f"Error during setup: {e}")
             raise SetupFailureException("Unable to configure the environment properly")
 
 class SettingsTask04(BaseTaskSetup):
@@ -188,16 +189,16 @@ class SettingsTask04(BaseTaskSetup):
             # If the switch is on, click it to turn it off
             if is_switch_on:
                 switch_element.click()
-                print("Switch turned off.")
+                logging.info("Switch turned off.")
 
             # Stop the settings app
             self.d.press("home")
             time.sleep(2)  # Pause to ensure the home operation completes
             self.d.app_stop("com.android.settings")
-            print("Settings app stopped and returned to home screen.")
+            logging.info("Settings app stopped and returned to home screen.")
 
         except Exception as e:
-            print(f"Error during setup: {e}")
+            logging.info(f"Error during setup: {e}")
             raise SetupFailureException("Unable to configure the environment properly")
              
 class SettingsTask05(BaseTaskSetup):
@@ -248,7 +249,7 @@ class SettingsTask05(BaseTaskSetup):
             self.d.app_stop("com.android.settings")
 
         except Exception as e:
-            print(f"Error during setup: {e}")
+            logging.info(f"Error during setup: {e}")
             raise SetupFailureException("Unable to configure the environment properly")
 
 class SettingsTask06(BaseTaskSetup):
@@ -281,7 +282,7 @@ class SettingsTask06(BaseTaskSetup):
             # If the switch is on, click it to turn it off
             if is_switch_on:
                 switch_element.click()
-                print("Network & internet switch turned off.")
+                logging.info("Network & internet switch turned off.")
 
             # Stop the settings app
             self.d.press("home")
@@ -289,7 +290,7 @@ class SettingsTask06(BaseTaskSetup):
             self.d.app_stop("com.android.settings")
 
         except Exception as e:
-            print(f"Error during setup: {e}")
+            logging.info(f"Error during setup: {e}")
             raise SetupFailureException("Unable to configure the environment properly")
 
 class SettingsTask07(BaseTaskSetup):
@@ -330,7 +331,7 @@ class SettingsTask07(BaseTaskSetup):
             self.d.app_stop("com.android.settings")
 
         except Exception as e:
-            print(f"Error during setup: {e}")
+            logging.info(f"Error during setup: {e}")
             raise SetupFailureException("Unable to configure the environment properly")
 
 class SettingsTask08(BaseTaskSetup):
@@ -377,7 +378,7 @@ class SettingsTask08(BaseTaskSetup):
             # If the switch is off, click it to turn it on
             if not is_switch_on:
                 switch_element.click()
-                print("Google Location Accuracy switch turned on.")
+                logging.info("Google Location Accuracy switch turned on.")
 
             # Stop the settings app
             self.d.press("home")
@@ -385,5 +386,5 @@ class SettingsTask08(BaseTaskSetup):
             self.d.app_stop("com.android.settings")
 
         except Exception as e:
-            print(f"Error during setup: {e}")
+            logging.info(f"Error during setup: {e}")
             raise SetupFailureException("Unable to configure the environment properly")

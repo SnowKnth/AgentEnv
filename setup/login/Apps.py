@@ -262,7 +262,7 @@ class Reddit(BaseApp):
             time.sleep(5)
             self.d.xpath('(//android.widget.LinearLayout\
                         [@resource-id="com.google.android.gms:id/container"])[1]/android.widget.LinearLayout').click()
-            print("1111")
+            logging.info("1111")
             time.sleep(10)
         # create account and init 
         # appium不能获取此界面，猜测的xpath

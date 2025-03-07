@@ -8,7 +8,7 @@ class EmulatorController:
         self.device_serial = device_serial
         self.params = params
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.state = "off"
+        self.state = "off" # off or on， the state of the emulator
 
     def load_emulator_with_snapshot(self, snapshot_name="default_boot") -> int:
         """
@@ -39,15 +39,56 @@ class EmulatorController:
                 cmd.append(f"{value}")
 
         self.logger.info(f"cmd: {cmd}")
-        print(f"**********************cmd: {cmd}*************************")
+        logging.info(f"**********************cmd: {cmd}*************************")
         try:
             self.logger.info(f"Loading emulator '{self.avd_name}' with snapshot '{snapshot_name}'.")
-            subprocess.Popen(cmd)
-            self.state = "on"
-            return 1
+            with open("log/emulator.log", "w") as log_file_handle:
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=log_file_handle,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
+                )
+
+                # 启动日志监控
+                if self.monitor_log_for_string(log_file_handle, "Failed to load snapshot 'default_boot'"):
+                    self.logger.error("Snapshot default_boot can't be loaded, terminate emulator...")
+                    self.exit_emulator()  # 终止子进程
+                    return -1
+                else:                   
+                    self.state = "on"
+                    return 1
         except Exception as e:
             self.logger.error(f"Error loading emulator with snapshot: {e}")
             return -1
+
+    def monitor_log_for_string(self, log_file_handle, target_string):
+        """
+        监控日志文件是否包含目标字符串。
+
+        Args:
+            log_file (str): 日志文件路径。
+            target_string (str): 要查找的目标字符串。
+        """
+        try:
+            # 移动到文件末尾
+            import os
+            log_file_handle.seek(0, os.SEEK_END)
+            start_time = time.time()
+            timeout = 30  # 30秒
+            lineCount = 0
+            while not (time.time() - start_time > timeout and lineCount > 35):
+                line = log_file_handle.readline()
+                if line:
+                    if target_string in line:
+                        self.logger.error(f"检测到目标字符串: {target_string}")
+                        return True  # 检测到目标字符串
+                else:
+                    lineCount += 1
+                    time.sleep(0.2)  # 等待文件更新
+        except KeyboardInterrupt:
+             self.logger.warning("监控被中断")
+        return False
 
     def get_adb_devices(self):
         """
@@ -102,7 +143,7 @@ class EmulatorController:
     #             cmd.append(f"{value}")
 
     #     self.logger.info(f"cmd: {cmd}")
-    #     print(f"**********************cmd: {cmd}*************************")
+    #     logging.info(f"**********************cmd: {cmd}*************************")
     #     try:
     #         self.logger.info(f"Loading emulator '{self.avd_name}' with snapshot '{snapshot_name}'.")
     #         subprocess.Popen(cmd)
@@ -133,6 +174,11 @@ class EmulatorController:
             self.exit_emulator()
             time.sleep(20)
             # restart the emulator with the specified snapshot
-            self.load_emulator_with_snapshot(snapshot_name)
-        else:
-            self.load_emulator_with_snapshot(snapshot_name)
+        is_new_load=self.load_emulator_with_snapshot()
+        while is_new_load<0:
+            self.logger.info("loading emulator failed, retrying...")
+            is_new_load=self.load_emulator_with_snapshot()
+            time.sleep(10)
+        if is_new_load==1:
+            self.logger.info("emulator loaded successfully!")
+            time.sleep(30) # waiting for emulator to start

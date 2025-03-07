@@ -88,7 +88,8 @@ def TaskSetUp(device, instruction):
         task = taskSetup(d, instruction)
         task.setup()
     else:
-        print(f"Task: {instruction} don`t need to setup.")
+        import logging
+        logging.info(f"Task: {instruction} don`t need to setup.")
         
 
 

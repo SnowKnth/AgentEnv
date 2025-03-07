@@ -1,5 +1,6 @@
 
 import time
+import logging
 from uiautomator2 import Device
 from setup.tasks.BaseTaskSetup import BaseTaskSetup, SetupFailureException
 # Pinterest app version: 12.14.0
@@ -83,9 +84,9 @@ def check_exist_board(d: Device, board_name: str = "DIY") -> bool:
                 board_list.append(name)
         
         if board_name in board_list:
-            print(f"{board_name} already exists.")
+            logging.info(f"{board_name} already exists.")
             return True
-        print(f"{board_name} not exists.")
+        logging.info(f"{board_name} not exists.")
         return False
 
     except Exception as e:

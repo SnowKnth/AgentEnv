@@ -1,5 +1,6 @@
 import time
 from uiautomator2 import Device
+import logging
 from setup.tasks.BaseTaskSetup import BaseTaskSetup,SetupFailureException
 # Google Drive app version: 2.21.241.10.80
 
@@ -120,7 +121,7 @@ class GoogleDriveTask02(BaseTaskSetup):
         if not check_sheet_exist(self.d):
             create_sheet(self.d)
         else:
-            print("Sheet already exists.")
+            logging.info("Sheet already exists.")
         
         # stop app
         self.d.press("home")

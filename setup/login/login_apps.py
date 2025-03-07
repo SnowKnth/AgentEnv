@@ -2,6 +2,7 @@ from app_factory import app_factory
 import yaml
 import uiautomator2 as u2
 import argparse
+import logging
 
 '''Open the apps and keep running for 10 seconds using Monkey mode.'''
 def login_apps(d, app_names):
@@ -10,7 +11,7 @@ def login_apps(d, app_names):
             app = app_factory(d, app_name)
             app.login()
         except Exception as e:
-            print(f"Error in login_apps for app {app_name}: {e}")
+            logging.info(f"Error in login_apps for app {app_name}: {e}")
             continue
 
 if __name__ == "__main__":

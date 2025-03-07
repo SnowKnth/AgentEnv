@@ -1,4 +1,5 @@
 import time
+import logging
 from uiautomator2 import Device
 from setup.tasks.BaseTaskSetup import BaseTaskSetup, SetupFailureException
 from setup.tasks.GoogleDrive import get_screenshot
@@ -33,7 +34,7 @@ def check_server_exist(d: Device, server_name: str="agentian's server") -> bool:
         # Find all the server nodes
         server_btns = d.xpath('//android.widget.AbsListView[@content-desc="Servers"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.Button').all()
         if not server_btns:
-            print(f"Server list not found.")
+            logging.info(f"Server list not found.")
             return []
         for server_button in server_btns:
             if server_button:

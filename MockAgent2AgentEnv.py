@@ -8,11 +8,11 @@ import os
 os.makedirs(LogConfig.LOG_FILE_PATH, exist_ok=True)
 # Setup logging using configuration settings
 log_file_name = f"{LogConfig.LOG_FILE_PATH}/{time.time()}_out.log"
-logging.basicConfig(level=getattr(logging, LogConfig.LOGGING_LEVEL),
-                    format=LogConfig.LOGGING_FORMAT,
-                    datefmt=LogConfig.LOGGING_DATE_FORMAT,
-                    handlers=[logging.FileHandler(log_file_name, 'a'),
-                              logging.StreamHandler()])
+# logging.basicConfig(level=getattr(logging, LogConfig.LOGGING_LEVEL),
+#                     format=LogConfig.LOGGING_FORMAT,
+#                     datefmt=LogConfig.LOGGING_DATE_FORMAT,
+#                     handlers=[logging.FileHandler(log_file_name, 'a'),
+#                               logging.StreamHandler()])
 
 # Initialize the Agent environment with configuration settings
 agent_env = AgentEnv(

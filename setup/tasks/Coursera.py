@@ -1,5 +1,6 @@
 from uiautomator2 import Device
 import time
+import logging
 from setup.tasks.BaseTaskSetup import BaseTaskSetup,SetupFailureException
 
 
@@ -57,7 +58,7 @@ def enroll_course(d: Device, course_name: str = "Algorithms, Part I"):
                 commit_button.click()
 
         except Exception as e:
-            print(f"not first course enrollment: {e}")
+            logging.info(f"not first course enrollment: {e}")
         
     except SetupFailureException as e:
         raise SetupFailureException(f"Unable to enroll in the course.{e}")

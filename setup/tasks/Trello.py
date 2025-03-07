@@ -1,4 +1,5 @@
 import time
+import logging
 from uiautomator2 import Device
 from setup.tasks.BaseTaskSetup import BaseTaskSetup,SetupFailureException
 # Trello app version: 2024.7.3.19946
@@ -133,7 +134,7 @@ def check_list_exist(d: Device, list_name: str="To Do") -> bool:
     func: check if the list exists in a board
     """
     list_names = get_all_listname_in_board(d)
-    print(f"lists: {list_names}")
+    logging.info(f"lists: {list_names}")
     if list_name in list_names:
         return True
     return False
@@ -149,7 +150,7 @@ def create_list(d: Device, list_name: str="To Do") -> None:
         found = False
         for _ in range(max_steps):
             if d.xpath('//android.widget.Button[@resource-id="com.trello:id/add_list_button"]').wait(timeout=2):
-                print("Add list button found")
+                logging.info("Add list button found")
                 found = True
                 break
             d.swipe(800, 500, 600, 500, 0.1)  # Swipe left to view more lists

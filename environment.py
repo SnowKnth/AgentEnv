@@ -49,8 +49,8 @@ class PrepareApps:
 
     def pull_installed_apps(self, local_apk_dir, instruction_fp="docs/instructions/llamatouch_task_metadata.csv") -> None:
         # 设置日志记录
-        logging.basicConfig(filename='pull_installed_apps.log', level=logging.ERROR, 
-                            format='%(asctime)s - %(levelname)s - %(message)s')
+        # logging.basicConfig(filename='pull_installed_apps.log', level=logging.ERROR, 
+                            # format='%(asctime)s - %(levelname)s - %(message)s')
         
         try:
             instructions = pd.read_csv(instruction_fp, sep='\t')
@@ -92,7 +92,7 @@ class PrepareApps:
                             package_name = content.split('/')[0]
                             apk_path = self.get_apk_path(package_name)
                             self.pull_apk(apk_path, dest_path)
-                            print(f"Extracted package name: {package_name} from {activity_file_path}")
+                            logging.info(f"Extracted package name: {package_name} from {activity_file_path}")
                             # 更新 app_dict
                             if episode not in app_dict:
                                 app_dict[episode] = [package_name, app_short]
@@ -109,7 +109,7 @@ class PrepareApps:
         try:
             with open(json_file_path, 'w') as json_file:
                 json.dump(app_dict, json_file, indent=4)
-            print(f"app_dict saved to {json_file_path}")
+            logging.info(f"app_dict saved to {json_file_path}")
         except Exception as e:
             logging.error(f"Error saving app_dict to JSON file: {e}")
 
@@ -118,7 +118,7 @@ class PrepareApps:
         try:
             with open(json_file_path, 'r') as json_file:
                 app_dict = json.load(json_file)
-            print(f"app_dict loaded from {json_file_path}")
+            logging.info(f"app_dict loaded from {json_file_path}")
             return app_dict
         except Exception as e:
             logging.error(f"Error loading app_dict from JSON file: {e}")

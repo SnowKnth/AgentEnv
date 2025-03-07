@@ -1,4 +1,5 @@
 import time
+import logging
 from uiautomator2 import Device
 from setup.tasks.BaseTaskSetup import BaseTaskSetup, SetupFailureException
 # Google Tasks app version: 2024.06.10.644692922.1-release
@@ -30,10 +31,10 @@ def check_task_exist(d: Device, task_name: str="Task2") -> bool:
                     all_task_names.append(name)
     
     if task_name in all_task_names:
-        print(f"{task_name} already exists")
+        logging.info(f"{task_name} already exists")
         return True
     
-    print(f"{task_name} not exists")
+    logging.info(f"{task_name} not exists")
     return False
 
 def create_task(d: Device, task_name: str = "Task2") -> None:
@@ -80,10 +81,10 @@ def check_list_exist(d: Device, list_name: str="Test") -> bool:
     for task_list in task_lists:
         content_desc = task_list.info.get('contentDescription', "").strip()
         if content_desc == list_name:
-            print(f"Found the element with text '{list_name}'")
+            logging.info(f"Found the element with text '{list_name}'")
             return True
     
-    print(f"Did not find the element with text '{list_name}'")
+    logging.info(f"Did not find the element with text '{list_name}'")
     return False
 
 def create_list(d: Device, list_name: str = "Test") -> None:
