@@ -59,7 +59,7 @@ class EmulatorController:
                     self.state = "on"
                     return 1
         except Exception as e:
-            self.logger.error(f"Error loading emulator with snapshot: {e}")
+            self.logger.exception(f"Error loading emulator with snapshot: {e}")
             return -1
 
     def monitor_log_for_string(self, log_file_handle, target_string):

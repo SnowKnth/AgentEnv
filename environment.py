@@ -206,19 +206,25 @@ class AgentEnv:
     
     def set_up(self) -> None:
         self.logger.info("loading emulator...")
-        is_new_load=self.emulator_controller.load_emulator_with_snapshot()
-        while is_new_load<0:
-            self.logger.info("loading emulator failed, retrying...")
-            is_new_load=self.emulator_controller.load_emulator_with_snapshot()
-            time.sleep(10)
-        if is_new_load==1:
-            self.logger.info("emulator loaded successfully!")
-            time.sleep(30) # waiting for emulator to start
-        self.logger.info("connecting to device...")
-        self.device.connect()
-        self._backtohome()
-        time.sleep(2)
-        self.logger.info("AgentEnv setup over!")
+        while 1:
+            try:
+                is_new_load=self.emulator_controller.load_emulator_with_snapshot()
+                while is_new_load<0:
+                    self.logger.info("loading emulator failed, retrying...")
+                    is_new_load=self.emulator_controller.load_emulator_with_snapshot()
+                    time.sleep(10)
+                if is_new_load==1:
+                    self.logger.info("emulator loaded newly successfully!")
+                    time.sleep(30) # waiting for emulator to start
+                self.logger.info("connecting to device...")
+                self.device.connect()
+                self._backtohome()
+                time.sleep(2)
+                self.logger.info("AgentEnv setup over!")
+                break
+            except Exception as e:
+                self.logger.exception(f"Error setting up the agent env: {e}")
+                time.sleep(10)
     
     def get_state(self) -> Dict[str, Any]:
         """
