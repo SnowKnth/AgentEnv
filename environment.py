@@ -292,7 +292,7 @@ class AgentEnv:
         self.logger.info("getting the agent env state_history...")
         return self.state_history
     
-    def post_action(self, action: str) -> bool: 
+    def post_action(self, action: str, do_execute=False) -> bool: 
         # action example
         # action_type: type, touch_point: [-1.0, -1.0], lift_point: [-1.0, -1.0], typed_text: ”best rated coffee maker”
         """Takes a step in the environment."""
@@ -301,14 +301,16 @@ class AgentEnv:
             action_dict = parse_action_string(action)
             action_type, action_para = parse_action(action_dict)
             self.current_action = self._trans_action_format(action_type, action_para)
-            # operator_state = self._execute_action(action_type, action_para)
+            if do_execute:
+                operator_state = self._execute_action(action_type, action_para) 
         elif action.startswith('Oracle'):
             self.current_action = action
             action_type = "Oracle"
         else:
             self.current_action = action
             action_type = "INTENT"
-            # operator_state = self.device.adb_shell(action)
+            if do_execute:
+                operator_state = self.device.adb_shell(action)
         if not ( self.current_action.startswith("am force-stop") and self.current_steps == 0 ):   
             # save the action
             tag = self.current_steps
@@ -367,10 +369,10 @@ class AgentEnv:
 
     def get_instruction(self) -> str:
         try:
-            instruction, gr_path, app_short, episode, path = next(self.instruction_generator)
+            instruction, gr_path, app_short, episode, path = next(self.instruction_generator) # path here contains category(e.g. web_shopping) and episode, is a full path
 
-            self.task_output_path = path.replace("googleapps", "google_apps").replace("webshopping", "web_shopping")
-            return instruction, gr_path, app_short, episode
+            self.task_output_path = path.replace("googleapps", "google_apps").replace("webshopping", "web_shopping") 
+            return instruction, gr_path, app_short, episode, self.task_output_path
         except StopIteration:
             self.logger.warning("All instructions have been fetched.")  
             return None
@@ -382,13 +384,19 @@ class AgentEnv:
         self.state_history = []
         self.episode_end = False
         self.current_steps = 0
-        self.device.disconnect()
-        time.sleep(5)
-        self.emulator_controller.reload_snapshot()
-        time.sleep(30)
-        self.device.connect()
-        time.sleep(5)
-        self.logger.info("agent env reset successfully!")
+        try:
+            self.device.disconnect()
+            time.sleep(5)
+            self.emulator_controller.reload_snapshot()
+            time.sleep(30)
+            self.device.connect()
+            time.sleep(5)
+            self.logger.info("agent env reset successfully!")
+        except Exception as e:
+            self.logger.exception(f"Error resetting agent env: {e}")
+            self.emulator_controller.reload_snapshot()
+            time.sleep(30)
+            self.device.connect()
 
     def episode_done(self) -> bool:
         return self.episode_end
@@ -419,35 +427,35 @@ class AndroidController(AgentEnv): # AndroidController is a subclass of AgentEnv
         self.width, self.height = None, None
 
 
-    def tap(self, tl, br):
+    def tap(self, tl, br, do_execute=False):
         x, y = (tl[0] + br[0]) // 2, (tl[1] + br[1]) // 2
         w, h = self.get_device_size()
         x /= w
         y /= h
         action = f"action_type: dual_point, touch_point: [{x}, {y}], lift_point: [{x}, {y}], typed_text: ''"
         # AgentEnv interface post_action
-        ret = self.post_action(action)
+        ret = self.post_action(action, do_execute=do_execute)
         return ret
 
-    def text(self, input_str):
+    def text(self, input_str, do_execute=False):
         # input_str = input_str.replace(" ", "%s") # Original AgentEnv
         # input_str = input_str.replace("'", "") # Original AgentEnv
         action = f"action_type: type, touch_point: [-1.0, -1.0], lift_point: [-1.0, -1.0], typed_text: '{input_str}'"
         # AgentEnv interface post_action       
-        ret = self.post_action(action)
+        ret = self.post_action(action, do_execute=do_execute)
         return ret
 
-    def long_press(self, tl, br, duration=1000):
+    def long_press(self, tl, br, duration=1000, do_execute=False ):
         x, y = (tl[0] + br[0]) // 2, (tl[1] + br[1]) // 2
         w, h = self.get_device_size()
         x /= w
         y /= h
         action = f"action_type: dual_point, touch_point: [{x}, {y}], lift_point: [{x}, {y}], typed_text: ''"
         # AgentEnv interface post_action        
-        ret = self.post_action(action)
+        ret = self.post_action(action, do_execute=do_execute)
         return ret
 
-    def swipe(self, tl, br, direction, dist="short", quick=False):
+    def swipe(self, tl, br, direction, dist="short", quick=False,  do_execute=False):
         # AgentEnv interface get the device_size
         self.width, self.height = self.get_device_size()
         unit_dist = int(self.width / 10)
@@ -474,9 +482,9 @@ class AndroidController(AgentEnv): # AndroidController is a subclass of AgentEnv
         xend = (x + offset[0]) / w
         yend = (y + offset[1]) / h
         action = f"action_type: dual_point, touch_point: [{xbegin}, {ybegin}], lift_point: [{xend}, {yend}], typed_text: ''"
-        ret = self.post_action(action)
+        ret = self.post_action(action, do_execute=do_execute)
         return ret
 
-    def intent(self, intent_str:str):
-        ret = self.post_action(intent_str)
+    def intent(self, intent_str:str,  do_execute=False):
+        ret = self.post_action(intent_str, do_execute=do_execute)
         return ret

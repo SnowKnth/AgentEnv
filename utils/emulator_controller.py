@@ -17,30 +17,31 @@ class EmulatorController:
         Args:
         snapshot_name (str): the name of snapshot.
         """
-        # Check if the emulator is already running
-        devices = self.get_adb_devices()
-        for device in devices:
-            if not device.startswith("emulator"):
-                continue
-            avd_name = self.get_avd_name_from_device(device)
-            if avd_name:
-                if avd_name.strip() == self.avd_name:
-                    self.logger.info(f"Emulator '{self.avd_name}' is already running. Skipping start.")
-                    return 0
-
-        # Build the command to start the emulator
-        cmd = ["emulator", "-avd", self.avd_name, "-port", self.device_serial.split("-")[1] , "-snapshot", snapshot_name, "-no-snapshot-save", "-feature", "-Vulkan"]
-        for key, value in self.params.items():
-            if key == "no-window":
-                if value == "true":
-                    cmd.append(f"-{key}")
-            else:
-                cmd.append(f"-{key}")
-                cmd.append(f"{value}")
-
-        self.logger.info(f"cmd: {cmd}")
-        logging.info(f"**********************cmd: {cmd}*************************")
         try:
+            # Check if the emulator is already running
+            devices = self.get_adb_devices()
+            for device in devices:
+                if not device.startswith("emulator"):
+                    continue
+                avd_name = self.get_avd_name_from_device(device)
+                if avd_name:
+                    if avd_name.strip() == self.avd_name:
+                        self.logger.info(f"Emulator '{self.avd_name}' is already running. Skipping start.")
+                        return 0
+
+            # Build the command to start the emulator
+            cmd = ["emulator", "-avd", self.avd_name, "-port", self.device_serial.split("-")[1] , "-snapshot", snapshot_name, "-no-snapshot-save", "-feature", "-Vulkan"]
+            for key, value in self.params.items():
+                if key == "no-window":
+                    if value == "true":
+                        cmd.append(f"-{key}")
+                else:
+                    cmd.append(f"-{key}")
+                    cmd.append(f"{value}")
+
+            self.logger.info(f"cmd: {cmd}")
+            logging.info(f"**********************cmd: {cmd}*************************")
+            
             self.logger.info(f"Loading emulator '{self.avd_name}' with snapshot '{snapshot_name}'.")
             with open("log/emulator.log", "w") as log_file_handle:
                 process = subprocess.Popen(
