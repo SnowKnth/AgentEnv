@@ -27,6 +27,7 @@ class EmulatorController:
                 if avd_name:
                     if avd_name.strip() == self.avd_name:
                         self.logger.info(f"Emulator '{self.avd_name}' is already running. Skipping start.")
+                        self.state = "on"
                         return 0
 
             # Build the command to start the emulator
@@ -43,7 +44,8 @@ class EmulatorController:
             logging.info(f"**********************cmd: {cmd}*************************")
             
             self.logger.info(f"Loading emulator '{self.avd_name}' with snapshot '{snapshot_name}'.")
-            with open("log/emulator.log", "w") as log_file_handle:
+            port_num = self.device_serial.split("-")[1]
+            with open(f"log/emulator_{port_num}.log", "w+") as log_file_handle:
                 process = subprocess.Popen(
                     cmd,
                     stdout=log_file_handle,
@@ -60,6 +62,7 @@ class EmulatorController:
                     self.state = "on"
                     return 1
         except Exception as e:
+            self.exit_emulator()  # 终止子进程
             self.logger.exception(f"Error loading emulator with snapshot: {e}")
             return -1
 

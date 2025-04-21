@@ -338,9 +338,9 @@ class AgentEnv:
             else:
                 with open(self.ep_installed_fp, 'w') as file:
                     file.write("")
-
-        # time.sleep(1) # original 5, i guess used to wait executing; now disable executing, so no need to wait
-        self.logger.info("action executed successfully")
+        if do_execute:
+            time.sleep(5) # original 5, i guess used to wait executing, modified; if disable executing, then no need to wait
+            self.logger.info("action executed successfully")
         return operator_state
     
     def save_chat(self, conversation: str):
@@ -370,7 +370,7 @@ class AgentEnv:
     def get_instruction(self) -> str:
         try:
             instruction, gr_path, app_short, episode, path = next(self.instruction_generator) # path here contains category(e.g. web_shopping) and episode, is a full path
-
+            self.current_episode = episode
             self.task_output_path = path.replace("googleapps", "google_apps").replace("webshopping", "web_shopping") 
             return instruction, gr_path, app_short, episode, self.task_output_path
         except StopIteration:
