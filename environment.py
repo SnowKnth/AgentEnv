@@ -344,11 +344,11 @@ class AgentEnv:
         return operator_state
     
     def save_chat(self, conversation: str):
-            tag = self.current_steps
-            action_dir_path = self._setup_directories(self.task_output_path, ['chat'])[0]
-            action_path = os.path.join(action_dir_path, f"{tag}.chat")
-            with open(action_path, "w") as action_file:
-                action_file.write(conversation)# n.chat
+        tag = self.current_steps
+        action_dir_path = self._setup_directories(self.task_output_path, ['chat'])[0]
+        action_path = os.path.join(action_dir_path, f"{tag}.chat")
+        with open(action_path, "w") as action_file:
+            action_file.write(conversation)# n.chat
 
     def save_intructions(self, similar_ins: str, instructions: dict):
         sim_path = os.path.join(self.task_output_path, "instructions_sim.txt")
@@ -359,6 +359,23 @@ class AgentEnv:
             sim_file.write(similar_ins)
         with open(ins_path,"w") as instruction_file:
             json.dump(instructions, instruction_file, indent=4)
+            
+    def update_instructions(self, instructions_list: list) -> None:
+        tag = self.current_steps
+        instr_dir_path = self._setup_directories(self.task_output_path, ['updated_instruction'])[0]
+        instr_path = os.path.join(instr_dir_path, f"{tag}.instruction")  
+                 # Ensure the directory exists
+        os.makedirs(os.path.dirname(instr_path), exist_ok=True)  
+                # 读取原始JSON文件
+        if os.path.exists(instr_path):
+            with open(instr_path, 'r') as f:
+                original_data = json.load(f)
+                original_data.append(instructions_list)
+        else:
+            original_data = [instructions_list]
+        # 写回文件
+        with open(instr_path, 'w') as f:
+            json.dump(original_data, f, indent=4)
 
     
     def get_device_size(self) -> tuple[int, int]:
