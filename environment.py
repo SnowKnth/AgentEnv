@@ -28,7 +28,6 @@ class PrepareApps:
         if result.returncode == 0:
             apk_path = result.stdout.strip().replace("package", "")
             if apk_path:
-                pp = apk_path.split(":")
                 return apk_path.split(":")[1].strip()
             else:
                 raise Exception(f"APK path not found for package: {package_name}")
@@ -130,6 +129,8 @@ class AgentEnv:
     def __init__(self, avd_name = None, emulator_controller_args=None,\
                  max_steps=30,local_output_path="exec_output",instruction_fp="docs/instructions/llamatouch_task_metadata.csv") -> None:
         
+        self.current_episode = None
+        self.task_output_path = None #包含category和episode的路径
         self.device_serial = f"emulator-{emulator_controller_args['port']}"
         self.logger = logging.getLogger(self.__class__.__name__)
         self.local_output_path = local_output_path
@@ -140,6 +141,9 @@ class AgentEnv:
         self.instructions = pd.read_csv(instruction_fp, sep='\t')
         self.instruction_generator = self._generate_instruction()
         self.max_steps = max_steps
+        
+
+
 
         self.current_action = "None|None|None"
         self.state_history = []
