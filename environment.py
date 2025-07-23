@@ -46,7 +46,7 @@ class PrepareApps:
 
 
 
-    def pull_installed_apps(self, local_apk_dir, instruction_fp="docs/instructions/llamatouch_task_metadata.csv") -> None:
+    def pull_installed_apps(self, local_apk_dir, instruction_fp="docs/instructions/llamatouch_task_metadata.tsv") -> None:
         # 设置日志记录
         # logging.basicConfig(filename='pull_installed_apps.log', level=logging.ERROR, 
                             # format='%(asctime)s - %(levelname)s - %(message)s')
@@ -104,30 +104,95 @@ class PrepareApps:
         # 将 app_dict 写入 JSON 文件
         self.save_app_dict(app_dict, "app_dict.json")
     
-    def save_app_dict(self, app_dict, json_file_path):
+    
+    def extract_max_step_to_json(
+        self,
+        instruction_fp: str = "docs/instructions/llamatouch_task_metadata.tsv",
+        output_json: str = "max_step.json"
+    ) -> None:
+        """
+        从每个 episode 目录的 i.activity 文件中提取最大数字，并写入 JSON 文件。
+        
+        Args:
+            instruction_fp (str): 包含 episode 和路径信息的 CSV/TSV 文件路径。
+            output_json (str): 输出 JSON 文件的路径。
+        """
         try:
-            with open(json_file_path, 'w') as json_file:
-                json.dump(app_dict, json_file, indent=4)
-            logging.info(f"app_dict saved to {json_file_path}")
+            # 读取指令文件
+            instructions = pd.read_csv(instruction_fp, sep='\t')
         except Exception as e:
-            logging.error(f"Error saving app_dict to JSON file: {e}")
+            print(f"Error reading CSV file: {e}")
+            return
 
-    @staticmethod
-    def load_app_dict(json_file_path):
+        max_step_dict: Dict[str, int] = {}  # {episode: max_step}
+
+        for _, row in instructions.iterrows():
+            try:
+                path = row['path']
+                episode = str(row['episode'])  # 确保 episode 是字符串（JSON 的 key 必须是 str）
+
+                # 拼接完整路径
+                full_path = os.path.join("../dataset/llamatouch_dataset_0521/", path)
+
+                # 检查路径是否存在
+                if not os.path.exists(full_path):
+                    print(f"Path does not exist: {full_path}")
+                    continue
+
+                # 获取所有符合 i.activity 格式的文件
+                activity_files = [
+                    f for f in os.listdir(full_path) 
+                    if re.match(r'\d+\.activity', f)
+                ]
+
+                if not activity_files:
+                    print(f"No activity files found in {full_path}")
+                    continue
+
+                # 提取文件名中的数字并找到最大值
+                max_step = max(
+                    int(re.search(r'\d+', f).group())  #group等价于group(0)
+                    for f in activity_files
+                )
+
+                # 更新字典
+                max_step_dict[episode] = max_step
+
+            except Exception as e:
+                print(f"Error processing episode {episode}: {e}")
+
+        # 写入 JSON 文件
         try:
-            with open(json_file_path, 'r') as json_file:
-                app_dict = json.load(json_file)
-            logging.info(f"app_dict loaded from {json_file_path}")
-            return app_dict
+            with open(output_json, 'w') as f:
+                json.dump(max_step_dict, f, indent=4)
+            print(f"Max steps saved to {output_json}")
         except Exception as e:
-            logging.error(f"Error loading app_dict from JSON file: {e}")
-            return None
-            
+            print(f"Error writing JSON file: {e}")
+        
+        def save_app_dict(self, app_dict, json_file_path):
+            try:
+                with open(json_file_path, 'w') as json_file:
+                    json.dump(app_dict, json_file, indent=4)
+                logging.info(f"app_dict saved to {json_file_path}")
+            except Exception as e:
+                logging.error(f"Error saving app_dict to JSON file: {e}")
+
+        @staticmethod
+        def load_app_dict(json_file_path):
+            try:
+                with open(json_file_path, 'r') as json_file:
+                    app_dict = json.load(json_file)
+                logging.info(f"app_dict loaded from {json_file_path}")
+                return app_dict
+            except Exception as e:
+                logging.error(f"Error loading app_dict from JSON file: {e}")
+                return None
+                
 
 
 class AgentEnv:
     def __init__(self, avd_name = None, emulator_controller_args=None,\
-                 max_steps=30,local_output_path="exec_output",instruction_fp="docs/instructions/llamatouch_task_metadata.csv") -> None:
+                 max_steps=30,local_output_path="exec_output",instruction_fp="docs/instructions/llamatouch_task_metadata.tsv") -> None:
         
         self.current_episode = None
         self.task_output_path = None #包含category和episode的路径
@@ -509,3 +574,7 @@ class AndroidController(AgentEnv): # AndroidController is a subclass of AgentEnv
     def intent(self, intent_str:str,  do_execute=False):
         ret = self.post_action(intent_str, do_execute=do_execute)
         return ret
+    
+if __name__ == "__main__":
+    prepareApps = PrepareApps("")
+    prepareApps.extract_max_step_to_json()
