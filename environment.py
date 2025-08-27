@@ -361,7 +361,7 @@ class AgentEnv:
         self.logger.info("getting the agent env state_history...")
         return self.state_history
     
-    def post_action(self, action: str, do_execute=False) -> bool: 
+    def post_action(self, action: str, do_execute=False, action_dict: dict[Any, Any]=None) -> bool: 
         # action example
         # action_type: type, touch_point: [-1.0, -1.0], lift_point: [-1.0, -1.0], typed_text: ”best rated coffee maker”
         """Takes a step in the environment."""
@@ -373,10 +373,16 @@ class AgentEnv:
             if do_execute:
                 operator_state = self._execute_action(action_type, action_para) 
         elif action.startswith('Oracle'):
-            self.current_action = action
+            if action_dict is not None:
+                self.current_action = json.dumps(action_dict)
+            else:
+                self.current_action = action
             action_type = "Oracle"
-        else:
-            self.current_action = action
+        else:            
+            if action_dict is not None:
+                self.current_action = json.dumps(action_dict)
+            else:
+                self.current_action = action
             action_type = "INTENT"
             if do_execute:
                 operator_state = self.device.adb_shell(action)
@@ -571,8 +577,12 @@ class AndroidController(AgentEnv): # AndroidController is a subclass of AgentEnv
         ret = self.post_action(action, do_execute=do_execute)
         return ret
 
-    def intent(self, intent_str:str,  do_execute=False):
-        ret = self.post_action(intent_str, do_execute=do_execute)
+    def intent(self, intent_str:str,  do_execute=False, intent_dict: dict[Any, Any] = None):        
+        ret = self.post_action(intent_str, do_execute=do_execute, action_dict=intent_dict)
+        return ret
+    
+    def oracle(self, oracle_str:str,  do_execute=False, oracle_dict: dict[Any, Any] = None):        
+        ret = self.post_action(oracle_str, do_execute=do_execute, action_dict=oracle_dict)
         return ret
     
 if __name__ == "__main__":
